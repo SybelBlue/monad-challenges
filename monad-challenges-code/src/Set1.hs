@@ -3,17 +3,16 @@
 module Set1 where
 
 import MCPrelude
-import Data.Tuple
 import Data.Char (chr, ord)
 
 main = do
     putStrLn $ if fiveRandsCheck then "Ok!" else "Err " ++ show fiveRands
     putStrLn $ if randString3Check then "Ok!" else "Err " ++ show randString3
 
-iterateRand1 randFunc = map fst $ iterate (randFunc . snd) (randFunc $ mkSeed 1)
+iterateRand1 = flip iterateRand (mkSeed 1)
 
 iterateRand :: (Seed -> (a, Seed)) -> Seed -> [a]
-iterateRand randFunc = map fst . iterate (randFunc . snd) . randFunc
+iterateRand r s = let (v, n) = r s in v : iterateRand r n
 
 iterateNRand1 n = take n . iterateRand1
 
