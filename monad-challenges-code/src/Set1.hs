@@ -25,6 +25,15 @@ randLetter = uncurry ((,) . chr . (+ ord 'a') . fromIntegral . (`mod` 26)) . ran
 
 randString3 = iterateNRand1 3 randLetter
 
+randEven :: Gen Integer 
+randEven s = let (v, n) = rand s in (2 * v, n)
+
+randOdd :: Gen Integer 
+randOdd s = let (v, n) = randEven s in (v + 1, n)
+
+randTen :: Gen Integer 
+randTen s = let (v, n) = rand s in (10 * v, n)
+
 fiveRandsCheck = checkProd == product fiveRands
     where checkProd = 8681089573064486461641871805074254223660
 
