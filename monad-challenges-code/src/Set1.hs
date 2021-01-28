@@ -1,13 +1,29 @@
+{-# LANGUAGE TupleSections #-}
+
 module Set1 where
 
 import MCPrelude
-import Data.Tuple (fst, snd)
+import Data.Tuple
+import Data.Char (chr, ord)
 
-main = putStrLn $ if check then "Ok!" else "Err " ++ show fiveRands
+main = do
+    putStrLn $ if fiveRandsCheck then "Ok!" else "Err " ++ show fiveRands
+    putStrLn $ if randString3Check then "Ok!" else "Err " ++ show randString3
 
-nRands n = map fst . take n $ iterate (rand . snd) (rand $ mkSeed 1)
+iterateRand1 randFunc = map fst $ iterate (randFunc . snd) (randFunc $ mkSeed 1)
 
-fiveRands = nRands 5
+iterateRand :: (Seed -> (a, Seed)) -> Seed -> [a]
+iterateRand randFunc = map fst . iterate (randFunc . snd) . randFunc
 
-check = checkProd == product fiveRands
+iterateNRand1 n = take n . iterateRand1
+
+fiveRands = iterateNRand1 5 rand
+
+randLetter = uncurry ((,) . chr . (+ ord 'a') . fromIntegral . (`mod` 26)) . rand
+
+randString3 = iterateNRand1 3 randLetter
+
+fiveRandsCheck = checkProd == product fiveRands
     where checkProd = 8681089573064486461641871805074254223660
+
+randString3Check = randString3 == "lrf"
