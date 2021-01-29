@@ -58,9 +58,7 @@ generalB combin f g s = do
     (combin r1 r2, s2)
 
 generalB2 :: (a -> b -> c) -> Gen a -> Gen b -> Gen c
-generalB2 f ga gb s = do 
-    let (f2, n) = generalA ga f s
-    generalA gb f2 n
+generalB2 f ga gb = uncurry (generalA gb) . generalA ga f
 
 repRandom :: [Gen a] -> Gen [a]
 -- repRandom :: [t -> (a, t)] -> t -> [a]
