@@ -95,6 +95,8 @@ addSalaries map n0 n1 = yLink (+) (lookupMay n0 map) (lookupMay n1 map)
 -- I was told to do this so I did
 mkMaybe = Just
 
-tailProd = chain (Just . product) . tailMay
+transMaybe f = chain (Just . f)
 
-tailSum = chain (Just . sum) . tailMay
+tailProd = transMaybe product . tailMay
+
+tailSum = transMaybe sum . tailMay
