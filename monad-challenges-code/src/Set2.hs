@@ -100,3 +100,13 @@ transMaybe f = chain (Just . f)
 tailProd = transMaybe product . tailMay
 
 tailSum = transMaybe sum . tailMay
+
+-- gross, again this is the signature I was given
+tailMax :: Ord a => [a] -> Maybe (Maybe a)
+tailMax = transMaybe maximumMay . tailMay
+
+tailMin :: Ord a => [a] -> Maybe (Maybe a)
+tailMin = transMaybe minimumMay . tailMay
+
+combine (Just x) = x
+combine _        = Nothing
