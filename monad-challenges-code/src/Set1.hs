@@ -1,4 +1,4 @@
--- {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TupleSections #-}
 
 module Set1 where
 
@@ -37,6 +37,8 @@ randOdd = generalA randEven succ
 randTen :: Gen Integer 
 randTen = generalA rand (*10)
 
+generalA :: Gen a -> (a -> b) -> Gen b
+-- generalA :: (p -> (t, b)) -> (t -> a) -> p -> (a, b)
 generalA f g s = let (v, n) = f s in (g v, n)
 
 randPair :: Gen (Char, Integer)
@@ -50,10 +52,18 @@ randPair_ = generalPair randLetter rand
 
 -- generalPair :: (p -> (a, b1)) -> (b1 -> (b2, b3)) -> p -> ((a, b2), b3)
 generalPair :: Gen a -> Gen b -> Gen (a, b)
-generalPair f g s = do
+generalPair = generalB (,)
+--   do
+--     let (r1, s1) = f s
+--     let (r2, s2) = g s1
+--     ((r1, r2), s2)
+
+generalB :: (a -> b -> c) -> Gen a -> Gen b -> Gen c
+-- generalB :: (t1 -> t2 -> a) -> (p -> (t1, b1)) -> (b1 -> (t2, b2)) -> p -> (a, b2)
+generalB combin f g s = do
     let (r1, s1) = f s
     let (r2, s2) = g s1
-    ((r1, r2), s2)
+    (combin r1 r2, s2)
 
 fiveRandsCheck = checkProd == product fiveRands
     where checkProd = 8681089573064486461641871805074254223660
