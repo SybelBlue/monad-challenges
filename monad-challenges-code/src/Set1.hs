@@ -62,11 +62,8 @@ generalB2 f ga gb = uncurry (generalA gb) . generalA ga f
 
 repRandom :: [Gen a] -> Gen [a]
 -- repRandom :: [t -> (a, t)] -> t -> [a]
-repRandom [] s = ([], s)
-repRandom (g:gs) s = do 
-    let (r, n) = g s
-    let (rest, final) = repRandom gs n
-    (r:rest, final)
+repRandom [] = []
+repRandom (g:gs) = generalB (:) g (repRandom gs)
 
 -- >>= (aka bind)
 genTwo :: Gen a -> (a -> Gen b) -> Gen b
