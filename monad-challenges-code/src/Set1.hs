@@ -12,6 +12,7 @@ main = do
     putStrLn $ if fiveRandsCheck then "Ok!" else "Err " ++ show fiveRands
     putStrLn $ if randString3Check then "Ok!" else "Err " ++ show randString3
     putStrLn $ if randEvenOddTenCheck then "Ok!" else "Err " ++ show randEvenOddTenCheck
+    putStrLn $ if generalPairCheck then "Ok!" else "Err " ++ show (randPair (mkSeed 1)) ++ show (randPair_ (mkSeed 1))
 
 iterateRand1 = flip iterateRand (mkSeed 1)
 
@@ -40,8 +41,19 @@ generalA f g s = let (v, n) = f s in (g v, n)
 
 randPair :: Gen (Char, Integer)
 -- randPair :: Seed -> ((Char, Integer), Seed)
-randPair s = ((l, d), final)
-    where (l, n) = randLetter s; (d, final) = rand n 
+randPair s = do
+    let (l, n) = randLetter s
+    let (d, final) = rand n
+    ((l, d), final)
+
+randPair_ = generalPair randLetter rand
+
+-- generalPair :: (p -> (a, b1)) -> (b1 -> (b2, b3)) -> p -> ((a, b2), b3)
+generalPair :: Gen a -> Gen b -> Gen (a, b)
+generalPair f g s = do
+    let (r1, s1) = f s
+    let (r2, s2) = g s1
+    ((r1, r2), s2)
 
 fiveRandsCheck = checkProd == product fiveRands
     where checkProd = 8681089573064486461641871805074254223660
@@ -50,3 +62,5 @@ randString3Check = randString3 == "lrf"
 
 randEvenOddTenCheck = checkProd == product (map (\f -> fst $ f $ mkSeed 1) [randEven, randOdd, randTen])
     where checkProd = 189908109902700
+
+generalPairCheck = randPair (mkSeed 1) == randPair_ (mkSeed 1)
