@@ -27,9 +27,6 @@ import Set2
 class Monad m where
     bind :: m a -> (a -> m b) -> m b
     return :: a -> m a
-    -- I added this for ease, equivalent to transMonad
-    fmap :: (a -> b) -> m a -> m b
-    fmap f ma = bind ma (return . f)
 
 instance Monad Maybe where
     return = Just
@@ -51,10 +48,32 @@ instance Monad Gen where
     return x = Gen (x,)
     bind ga fgb = Gen $ \s -> let (r, n) = runGen ga s in runGen (fgb r) n
 
+-- I added this for ease, equivalent to transMonad
+fmap :: Monad m => (a -> b) -> m a -> m b
+fmap f ma = bind ma (return . f)
+
+-- Set1 (generalB), Set2 (yLink), Set3 (allCombs)
 liftM2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
 -- using only bind and return:
 -- liftM2 combin ma mb = bind (bind ma (return . combin)) (bind mb . (.) return)
-liftM2 combin ma mb = bind (fmap combin ma) (`fmap` mb)
+liftM2 f = ap . fmap f
 
-sequence :: [Gen a] -> Gen [a]
+-- Set1 (repRandom)
+sequence :: Monad m => [m a] -> m [a]
 sequence = foldr (liftM2 (:)) (return [])
+
+-- Set2 (chain)
+(=<<) :: (a -> Maybe b) -> Maybe a -> Maybe b
+(=<<) = flip bind
+
+-- Set2 (combine)
+-- join :: Monad m => m (m a) -> m a
+-- join = 
+
+-- Set3 (combStep)
+ap :: Monad m => m (a -> b) -> m a -> m b
+ap mf ma = bind mf (`fmap` ma)
+
+-- Set3 (allCombs3)
+liftM3 :: Monad m => (a -> b -> c -> d) -> m a -> m b -> m c -> m d
+liftM3 combin ma = ap . liftM2 combin ma
