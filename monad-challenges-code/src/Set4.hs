@@ -67,8 +67,8 @@ sequence = foldr (liftM2 (:)) (return [])
 (=<<) = flip bind
 
 -- Set2 (combine)
--- join :: Monad m => m (m a) -> m a
--- join = 
+join :: Monad m => m (m a) -> m a
+join = flip bind id
 
 -- Set3 (combStep)
 ap :: Monad m => m (a -> b) -> m a -> m b
