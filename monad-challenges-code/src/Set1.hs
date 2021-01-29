@@ -1,8 +1,6 @@
-{-# LANGUAGE TupleSections #-}
-
 module Set1 where
 
-import MCPrelude
+import MCPrelude ( Seed, mkSeed, rand )
 import Data.Char (chr, ord)
 import Data.Tuple (fst)
 
