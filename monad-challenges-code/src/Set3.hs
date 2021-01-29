@@ -4,13 +4,16 @@ import MCPrelude
 
 import Prelude ()
 
-allPairs [] _ = []
-allPairs (x:xs) bs = zip (repeat  x) bs ++ allPairs xs bs
+
+allCombs :: (a -> b -> c) -> [a] -> [b] -> [c]
+allCombs _ [] _ = []
+allCombs f (a:as) bs = map (f a) bs ++ allCombs f as bs
+
+allPairs = allCombs (,)
 
 data Card = Card Int String
 
 instance Show Card where
     show (Card r s) = show r ++ s
 
-allCards :: [Int] -> [String] -> [Card]
-allCards rs ss = map (uncurry Card) $ allPairs rs ss
+allCards = allCombs Card
