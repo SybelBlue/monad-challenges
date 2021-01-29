@@ -31,3 +31,7 @@ combStep :: [a -> b] -> [a] -> [b]
 combStep _ [] = []
 combStep [] _ = []
 combStep (f:fs) as = map f as ++ combStep fs as
+
+allCombs4 :: (a -> b -> c -> d -> e) -> [a] -> [b] -> [c] -> [d] -> [e]
+allCombs4 f as bs cs = combStep (allCombs3 f as bs cs)
+-- can be continued forever, that is the power of combStep
