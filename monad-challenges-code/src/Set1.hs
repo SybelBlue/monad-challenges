@@ -38,6 +38,11 @@ randTen = generalA rand (*10)
 
 generalA f g s = let (v, n) = f s in (g v, n)
 
+randPair :: Gen (Char, Integer)
+-- randPair :: Seed -> ((Char, Integer), Seed)
+randPair s = ((l, d), final)
+    where (l, n) = randLetter s; (d, final) = rand n 
+
 fiveRandsCheck = checkProd == product fiveRands
     where checkProd = 8681089573064486461641871805074254223660
 
