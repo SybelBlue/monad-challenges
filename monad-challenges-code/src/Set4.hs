@@ -6,9 +6,9 @@ import MCPrelude
 
 import Prelude ()
 
-import Data.Tuple (fst)
+import Data.Tuple ( fst )
 
-import Set2
+import Set2 ( Maybe(..) )
 
 -- from Set1
 -- generalA :: Gen a -> (a -> b) -> Gen b
@@ -30,7 +30,8 @@ class Monad m where
 
 instance Monad Maybe where
     return = Just
-    bind = link
+    bind Nothing _ = Nothing 
+    bind (Just x) f = f x
 
 instance Monad [] where
     return = (:[])
