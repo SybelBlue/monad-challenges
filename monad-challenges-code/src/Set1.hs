@@ -59,6 +59,14 @@ generalB combin f g s = do
     let (r2, s2) = g s1
     (combin r1 r2, s2)
 
+repRandom :: [Gen a] -> Gen [a]
+-- repRandom :: [t -> (a, t)] -> t -> [a]
+repRandom [] s = ([], s)
+repRandom (g:gs) s = do 
+    let (r, n) = g s
+    let (rest, final) = repRandom gs n
+    (r:rest, final)
+
 --             TEST ITEMS FROM HERE ON          ---------------
 
 main = do
@@ -66,6 +74,7 @@ main = do
     putStrLn $ if randString3Check then "Ok!" else "Err " ++ show randString3
     putStrLn $ if randEvenOddTenCheck then "Ok!" else "Err " ++ show randEvenOddTenCheck
     putStrLn $ if generalPairCheck then "Ok!" else "Err " ++ show (randPair (mkSeed 1)) ++ show (randPair_ (mkSeed 1))
+    putStrLn $ if repRandomCheck then "Ok!" else "Err " ++ show (repRandom (replicate  3 randLetter) (mkSeed 1)) ++ show randString3
 
 fiveRandsCheck = checkProd == product fiveRands
     where checkProd = 8681089573064486461641871805074254223660
@@ -76,3 +85,5 @@ randEvenOddTenCheck = checkProd == product (map (\f -> fst $ f $ mkSeed 1) [rand
     where checkProd = 189908109902700
 
 generalPairCheck = randPair (mkSeed 1) == randPair_ (mkSeed 1)
+
+repRandomCheck = fst (repRandom (replicate 3 randLetter) (mkSeed 1)) == randString3
