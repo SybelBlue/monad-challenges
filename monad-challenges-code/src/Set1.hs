@@ -8,12 +8,6 @@ import Data.Tuple (fst)
 
 type Gen a = Seed -> (a, Seed)
 
-main = do
-    putStrLn $ if fiveRandsCheck then "Ok!" else "Err " ++ show fiveRands
-    putStrLn $ if randString3Check then "Ok!" else "Err " ++ show randString3
-    putStrLn $ if randEvenOddTenCheck then "Ok!" else "Err " ++ show randEvenOddTenCheck
-    putStrLn $ if generalPairCheck then "Ok!" else "Err " ++ show (randPair (mkSeed 1)) ++ show (randPair_ (mkSeed 1))
-
 iterateRand1 = flip iterateRand (mkSeed 1)
 
 iterateRand :: Gen a -> Seed -> [a]
@@ -64,6 +58,14 @@ generalB combin f g s = do
     let (r1, s1) = f s
     let (r2, s2) = g s1
     (combin r1 r2, s2)
+
+--             TEST ITEMS FROM HERE ON          ---------------
+
+main = do
+    putStrLn $ if fiveRandsCheck then "Ok!" else "Err " ++ show fiveRands
+    putStrLn $ if randString3Check then "Ok!" else "Err " ++ show randString3
+    putStrLn $ if randEvenOddTenCheck then "Ok!" else "Err " ++ show randEvenOddTenCheck
+    putStrLn $ if generalPairCheck then "Ok!" else "Err " ++ show (randPair (mkSeed 1)) ++ show (randPair_ (mkSeed 1))
 
 fiveRandsCheck = checkProd == product fiveRands
     where checkProd = 8681089573064486461641871805074254223660
