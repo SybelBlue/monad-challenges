@@ -1,10 +1,13 @@
+{-# LANGUAGE TupleSections #-}
+
 module Set4 where
 
 import MCPrelude
 
 import Prelude ()
 
-import Set1
+import Data.Tuple (fst)
+
 import Set2
 
 -- from Set1
@@ -32,3 +35,15 @@ instance Monad Maybe where
 instance Monad [] where
     return = (:[])
     bind = flip concatMap 
+
+-- type synonyms can't have instances, but newtypes,
+-- which are as fast and light as type synonyms, can.
+-- so we remake the Gen type with the same basic signature
+newtype Gen a = Gen { gen :: Seed -> (a, Seed) }
+
+evalGen :: Gen a -> Seed -> a
+evalGen g = fst . gen g
+
+instance Monad Gen where
+    return x = Gen (x,)
+    bind ga fgb = Gen $ \s -> let (r, n) = gen ga s in gen (fgb r) n
