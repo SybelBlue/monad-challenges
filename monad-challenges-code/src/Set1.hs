@@ -67,6 +67,14 @@ repRandom (g:gs) s = do
     let (rest, final) = repRandom gs n
     (r:rest, final)
 
+-- >>= (aka bind)
+genTwo :: Gen a -> (a -> Gen b) -> Gen b
+genTwo gen fn = uncurry fn . gen
+
+-- return
+mkGen :: a -> Gen a
+mkGen = (,)
+
 --             TEST ITEMS FROM HERE ON          ---------------
 
 main = do
