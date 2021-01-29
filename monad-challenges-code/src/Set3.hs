@@ -6,10 +6,11 @@ import Prelude ()
 
 
 allCombs :: (a -> b -> c) -> [a] -> [b] -> [c]
+allCombs f as = combStep (map f as)
+-- old implementation
 -- allCombs _ _ [] = []
 -- allCombs _ [] _ = []
 -- allCombs f (a:as) bs = map (f a) bs ++ allCombs f as bs
-allCombs f as = combStep (map f as)
 
 allPairs = allCombs (,)
 
@@ -21,12 +22,9 @@ instance Show Card where
 allCards = allCombs Card
 
 allCombs3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
--- allCombs3 _ [] _ _ = []
--- allCombs3 _ _ [] _ = []
--- allCombs3 _ _ _ [] = []
--- allCombs3 f (a:as) bs cs = map (uncurry $ f a) (allPairs bs cs) ++ allCombs3 f as bs cs
 allCombs3 f as bs = combStep (allCombs f as bs)
 
+-- note how combStep is a mirror of the original implementation of allCombs
 combStep :: [a -> b] -> [a] -> [b]
 combStep _ [] = []
 combStep [] _ = []
