@@ -39,11 +39,11 @@ instance Monad [] where
 -- type synonyms can't have instances, but newtypes,
 -- which are as fast and light as type synonyms, can.
 -- so we remake the Gen type with the same basic signature
-newtype Gen a = Gen { gen :: Seed -> (a, Seed) }
+newtype Gen a = Gen { runGen :: Seed -> (a, Seed) }
 
 evalGen :: Gen a -> Seed -> a
-evalGen g = fst . gen g
+evalGen g = fst . runGen g
 
 instance Monad Gen where
     return x = Gen (x,)
-    bind ga fgb = Gen $ \s -> let (r, n) = gen ga s in gen (fgb r) n
+    bind ga fgb = Gen $ \s -> let (r, n) = runGen ga s in runGen (fgb r) n
