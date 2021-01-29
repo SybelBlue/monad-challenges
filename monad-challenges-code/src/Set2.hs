@@ -85,7 +85,13 @@ queryGreek d k = let xs = lookupMay k d in
         Just xmax -> chain (divMay (fromIntegral xmax)) (chain (Just . fromIntegral) $ chain headMay xs)
         _ -> Nothing
 
+yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+yLink f (Just x) (Just y) = Just (f x y)
+yLink _ _        _        = Nothing
+
 addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
-addSalaries map n0 n1 = case lookupMay n0 map of
-    Just n -> chain (Just . (+n)) $ lookupMay n1 map
-    _ -> Nothing
+addSalaries map n0 n1 = yLink (+) (lookupMay n0 map) (lookupMay n1 map)
+
+-- I was told to do this so I did
+mkMaybe :: a -> Maybe a
+mkMaybe = Just
