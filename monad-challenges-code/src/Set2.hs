@@ -4,6 +4,9 @@ import MCPrelude
 
 import Prelude ()
 
+
+-------- Maybe Type ---------------------------------
+
 data Maybe a = Just a | Nothing 
 
 instance Show a => Show (Maybe a) where
@@ -14,6 +17,9 @@ instance Eq a => Eq (Maybe a) where
     (==) (Just a) (Just b) = a == b
     (==) Nothing  Nothing  = True
     (==) _        _        = False
+
+
+-------- Prelude Functions ---------------------------
 
 headMay :: [a] -> Maybe a
 headMay []    = Nothing
@@ -44,3 +50,18 @@ minimumMay (x:xs) =
     case maximumMay xs of
         Just n -> Just $ if n > x then n else x
         Nothing -> Just x
+
+
+---- Example Uses ------------------------------------------
+
+-- forced me to do this expansion yukkk
+queryGreek :: GreekData -> String -> Maybe Double
+queryGreek d k = case lookupMay k d of
+    Just xs -> case tailMay xs of
+        Just xtail -> case maximumMay xtail of
+            Just xmax -> case headMay xs of
+                Just xhead -> divMay (fromIntegral xmax) (fromIntegral xhead)
+                _ -> Nothing
+            _ -> Nothing
+        _ -> Nothing
+    _ -> Nothing
