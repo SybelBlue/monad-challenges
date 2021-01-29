@@ -51,17 +51,41 @@ minimumMay (x:xs) =
         Just n -> Just $ if n > x then n else x
         Nothing -> Just x
 
+-- dont think I"m supposed to have this yet
+-- maybe :: (a -> b) -> Maybe a -> Maybe b
+-- maybe _ Nothing = Nothing
+-- maybe f (Just x) = Just (f x)
 
 ---- Example Uses ------------------------------------------
 
 -- forced me to do this expansion yukkk
+-- queryGreek :: GreekData -> String -> Maybe Double
+-- queryGreek d k = case lookupMay k d of
+--     Just xs -> case tailMay xs of
+--         Just xtail -> case maximumMay xtail of
+--             Just xmax -> case headMay xs of
+--                 Just xhead -> divMay (fromIntegral xmax) (fromIntegral xhead)
+--                 _ -> Nothing
+--             _ -> Nothing
+--         _ -> Nothing
+--     _ -> Nothing
+
+chain :: (a -> Maybe b) -> Maybe a -> Maybe b
+chain _ Nothing = Nothing
+chain f (Just x) = f x
+
+link :: Maybe a -> (a -> Maybe b) -> Maybe b
+link Nothing  _ = Nothing
+link (Just x) f = f x
+
+-- rewrite using chain and link, better but still gross
 queryGreek :: GreekData -> String -> Maybe Double
-queryGreek d k = case lookupMay k d of
-    Just xs -> case tailMay xs of
-        Just xtail -> case maximumMay xtail of
-            Just xmax -> case headMay xs of
-                Just xhead -> divMay (fromIntegral xmax) (fromIntegral xhead)
-                _ -> Nothing
-            _ -> Nothing
+queryGreek d k = let xs = lookupMay k d in 
+    case chain maximumMay (chain tailMay xs) of
+        Just xmax -> chain (divMay (fromIntegral xmax)) (chain (Just . fromIntegral) $ chain headMay xs)
         _ -> Nothing
+
+addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
+addSalaries map n0 n1 = case lookupMay n0 map of
+    Just n -> chain (Just . (+n)) $ lookupMay n1 map
     _ -> Nothing
