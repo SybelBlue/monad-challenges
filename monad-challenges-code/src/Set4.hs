@@ -2,11 +2,9 @@
 
 module Set4 where
 
-import MCPrelude
+import MCPrelude ( Seed )
 
-import Prelude ()
-
-import Data.Tuple ( fst )
+import Prelude ( fst, ($), foldr, concatMap, (.), flip, id )
 
 import Set2 ( Maybe(..) )
 
