@@ -27,6 +27,9 @@ import Set2
 class Monad m where
     bind :: m a -> (a -> m b) -> m b
     return :: a -> m a
+    -- I added this for ease, equivalent to transMonad
+    fmap :: (a -> b) -> m a -> m b
+    fmap f ma = bind ma (return . f)
 
 instance Monad Maybe where
     return = Just
@@ -47,3 +50,11 @@ evalGen g = fst . runGen g
 instance Monad Gen where
     return x = Gen (x,)
     bind ga fgb = Gen $ \s -> let (r, n) = runGen ga s in runGen (fgb r) n
+
+liftM2 :: Monad m => (a -> b -> c) -> m a -> m b -> m c
+-- using only bind and return:
+-- liftM2 combin ma mb = bind (bind ma (return . combin)) (bind mb . (.) return)
+liftM2 combin ma mb = bind (fmap combin ma) (`fmap` mb)
+
+sequence :: [Gen a] -> Gen [a]
+sequence = foldr (liftM2 (:)) (return [])
