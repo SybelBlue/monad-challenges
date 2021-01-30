@@ -1,5 +1,3 @@
-{-# LANGUAGE TupleSections #-}
-
 module Set4 where
 
 import MCPrelude ( Seed )
@@ -17,8 +15,8 @@ import Prelude ( fst, ($), foldr, concatMap, (.), flip, id )
 -- yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c  <<< similarity 2
 
 -- Similarity abstractions
--- sim1 :: m a -> (a -> m b) m b
--- sim2 :: (a -> b -> c) -> m a -> m b -> m c
+-- sim1 :: m a -> (a -> m b) m b                            <<< bind
+-- sim2 :: (a -> b -> c) -> m a -> m b -> m c               <<< liftM2
 
 class Monad m where
     bind :: m a -> (a -> m b) -> m b
