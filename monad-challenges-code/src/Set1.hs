@@ -1,4 +1,12 @@
+{-# LANGUAGE TupleSections #-}
+
 module Set1 where
+
+import Prelude 
+    ( Char, Integer
+    , ($), (.), (+), (*), (==), (++)
+    , uncurry, fromIntegral, mod, flip, take, putStrLn, product, show, replicate, map
+    )
 
 import MCPrelude ( Seed, mkSeed, rand )
 import Data.Char (chr, ord)
@@ -24,7 +32,7 @@ randEven :: Gen Integer
 randEven = generalA rand (*2)
 
 randOdd :: Gen Integer 
-randOdd = generalA randEven succ
+randOdd = generalA randEven (+1)
 
 randTen :: Gen Integer 
 randTen = generalA rand (*10)
@@ -63,7 +71,7 @@ generalB2 f ga gb = uncurry (generalA gb) . generalA ga f
 
 repRandom :: [Gen a] -> Gen [a]
 -- repRandom :: [t -> (a, t)] -> t -> [a]
-repRandom [] = []
+repRandom [] = ([],)
 repRandom (g:gs) = generalB (:) g (repRandom gs)
 
 -- >>= (aka bind)
