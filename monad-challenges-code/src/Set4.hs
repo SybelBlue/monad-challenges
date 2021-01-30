@@ -6,8 +6,6 @@ import MCPrelude ( Seed )
 
 import Prelude ( fst, ($), foldr, concatMap, (.), flip, id )
 
-import Set2 ( Maybe(..) )
-
 -- from Set1
 -- generalA :: Gen a -> (a -> b) -> Gen b
 -- genTwo :: Gen a -> (a -> Gen b) -> Gen b                 <<< similarity 1 
@@ -25,11 +23,6 @@ import Set2 ( Maybe(..) )
 class Monad m where
     bind :: m a -> (a -> m b) -> m b
     return :: a -> m a
-
-instance Monad Maybe where
-    return = Just
-    bind Nothing _ = Nothing 
-    bind (Just x) f = f x
 
 instance Monad [] where
     return = (:[])
@@ -50,7 +43,7 @@ sequence :: Monad m => [m a] -> m [a]
 sequence = foldr (liftM2 (:)) (return [])
 
 -- Set2 (chain)
-(=<<) :: (a -> Maybe b) -> Maybe a -> Maybe b
+(=<<) :: Monad m => (a -> m b) -> m a -> m b
 (=<<) = flip bind
 
 -- Set2 (combine)
