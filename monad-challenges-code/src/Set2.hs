@@ -2,6 +2,8 @@ module Set2 where
 
 import MCPrelude
 
+import Set4
+
 import Prelude ()
 
 
@@ -17,6 +19,11 @@ instance Eq a => Eq (Maybe a) where
     (==) (Just a) (Just b) = a == b
     (==) Nothing  Nothing  = True
     (==) _        _        = False
+
+instance Monad Maybe where
+    return = Just
+    bind Nothing _ = Nothing
+    bind (Just x) f = f x
 
 
 -------- Prelude Functions ---------------------------
@@ -70,43 +77,51 @@ minimumMay (x:xs) =
 --         _ -> Nothing
 --     _ -> Nothing
 
-chain :: (a -> Maybe b) -> Maybe a -> Maybe b
-chain _ Nothing = Nothing
-chain f (Just x) = f x
+-- replaced by =<< (aka flip bind)
+-- chain :: (a -> Maybe b) -> Maybe a -> Maybe b
+-- chain _ Nothing = Nothing
+-- chain f (Just x) = f x
 
-link :: Maybe a -> (a -> Maybe b) -> Maybe b
-link Nothing  _ = Nothing
-link (Just x) f = f x
+-- replaced by bind
+-- link :: Maybe a -> (a -> Maybe b) -> Maybe b
+-- link Nothing  _ = Nothing
+-- link (Just x) f = f x
 
--- rewrite using chain and link, better but still gross
 queryGreek :: GreekData -> String -> Maybe Double
-queryGreek d k = let xs = lookupMay k d in 
-    case chain maximumMay (chain tailMay xs) of
-        Just xmax -> chain (divMay (fromIntegral xmax)) (chain (Just . fromIntegral) $ chain headMay xs)
-        _ -> Nothing
+queryGreek d k = join $ liftM2 divMay mnum mdenom
+    where 
+        xs = lookupMay k d
+        mnum = fmap fromIntegral $ maximumMay =<< tailMay =<< xs
+        mdenom = fmap fromIntegral $ headMay =<< xs
 
-yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
-yLink f (Just x) (Just y) = Just (f x y)
-yLink _ _        _        = Nothing
+-- replaced by liftM2
+-- yLink :: (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
+-- yLink f (Just x) (Just y) = Just (f x y)
+-- yLink _ _        _        = Nothing
 
 addSalaries :: [(String, Integer)] -> String -> String -> Maybe Integer
-addSalaries map n0 n1 = yLink (+) (lookupMay n0 map) (lookupMay n1 map)
+addSalaries map n0 n1 = liftM2 (+) (lookupMay n0 map) (lookupMay n1 map)
 
--- I was told to do this so I did
-mkMaybe = Just
+-- replaced by return
+-- mkMaybe = Just
 
-transMaybe f = chain (Just . f)
+-- replaced by fmap
+-- transMaybe Nothing _ = Nothing
+-- transMaybe (Just x) f = Just (f x)
 
-tailProd = transMaybe product . tailMay
+tailProd :: [Integer] -> Maybe Integer
+tailProd = fmap product . tailMay
 
-tailSum = transMaybe sum . tailMay
+tailSum :: [Integer] -> Maybe Integer
+tailSum = fmap sum . tailMay
 
 -- gross, again this is the signature I was given
 tailMax :: Ord a => [a] -> Maybe (Maybe a)
-tailMax = transMaybe maximumMay . tailMay
+tailMax = fmap maximumMay . tailMay
 
 tailMin :: Ord a => [a] -> Maybe (Maybe a)
-tailMin = transMaybe minimumMay . tailMay
+tailMin = fmap minimumMay . tailMay
 
-combine (Just x) = x
-combine _        = Nothing
+-- replaced by join
+-- combine (Just x) = x
+-- combine _        = Nothing
