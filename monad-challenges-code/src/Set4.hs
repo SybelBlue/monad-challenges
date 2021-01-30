@@ -45,6 +45,7 @@ sequence = foldr (liftM2 (:)) (return [])
 -- Set2 (chain)
 (=<<) :: Monad m => (a -> m b) -> m a -> m b
 (=<<) = flip bind
+infixr 8 =<<
 
 -- Set2 (combine)
 join :: Monad m => m (m a) -> m a
