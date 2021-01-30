@@ -4,9 +4,10 @@ import MCPrelude
 
 import Prelude ()
 
+import Set4
 
 allCombs :: (a -> b -> c) -> [a] -> [b] -> [c]
-allCombs f as = combStep (map f as)
+allCombs f = ap . fmap f
 -- old implementation
 -- allCombs _ _ [] = []
 -- allCombs _ [] _ = []
@@ -22,14 +23,15 @@ instance Show Card where
 allCards = allCombs Card
 
 allCombs3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
-allCombs3 f as bs = combStep (allCombs f as bs)
+allCombs3 f as = ap . allCombs f as
 
+-- replaced by ap
 -- note how combStep is a mirror of the original implementation of allCombs
-combStep :: [a -> b] -> [a] -> [b]
-combStep _ [] = []
-combStep [] _ = []
-combStep (f:fs) as = map f as ++ combStep fs as
+-- combStep :: [a -> b] -> [a] -> [b]
+-- combStep _ [] = []
+-- combStep [] _ = []
+-- combStep (f:fs) as = map f as ++ combStep fs as
 
 allCombs4 :: (a -> b -> c -> d -> e) -> [a] -> [b] -> [c] -> [d] -> [e]
-allCombs4 f as bs cs = combStep (allCombs3 f as bs cs)
--- can be continued forever, that is the power of combStep
+allCombs4 f as bs = ap . allCombs3 f as bs
+-- pattern can be continued forever, that is the power of ap (combStep)
