@@ -3,7 +3,7 @@
 module Set1 where
 
 import Prelude 
-    ( Char, Integer
+    ( Char, Integer, Int, IO, Bool
     , ($), (.), (+), (*), (==), (++)
     , uncurry, fromIntegral, mod, flip, take, putStrLn, product, show, replicate, map
     )
@@ -12,32 +12,24 @@ import MCPrelude ( Seed, mkSeed, rand )
 import Data.Char (chr, ord)
 import Data.Tuple (fst)
 
-import Set4
+type Gen a = Seed -> (a, Seed)
 
--- type synonyms can't have instances, but newtypes,
--- which are as fast and light as type synonyms, can.
--- so we remake the Gen type with the same basic signature
-newtype Gen a = Gen { runGen :: Seed -> (a, Seed) }
-
-evalGen :: Gen a -> Seed -> a
-evalGen g = fst . runGen g
-
-instance Monad Gen where
-    return x = Gen (x,)
-    bind ga fgb = Gen $ \s -> let (r, n) = runGen ga s in runGen (fgb r) n
-
+iterateRand1 :: Gen a -> [a]
 iterateRand1 = flip iterateRand (mkSeed 1)
 
 iterateRand :: Gen a -> Seed -> [a]
 iterateRand r s = let (v, n) = r s in v : iterateRand r n
 
+iterateNRand1 :: Int -> Gen a -> [a]
 iterateNRand1 n = take n . iterateRand1
 
+fiveRands :: [Integer]
 fiveRands = iterateNRand1 5 rand
 
 randLetter :: Gen Char
 randLetter = uncurry ((,) . chr . (+ ord 'a') . fromIntegral . (`mod` 26)) . rand
 
+randString3 :: [Char]
 randString3 = iterateNRand1 3 randLetter
 
 randEven :: Gen Integer 
@@ -60,6 +52,7 @@ randPair s = do
     let (d, final) = rand n
     ((l, d), final)
 
+randPair_ :: Gen (Char, Integer)
 randPair_ = generalPair randLetter rand
 
 -- generalPair :: (p -> (a, b1)) -> (b1 -> (b2, b3)) -> p -> ((a, b2), b3)
@@ -96,6 +89,7 @@ mkGen = (,)
 
 --             TEST ITEMS FROM HERE ON          ---------------
 
+main :: IO ()
 main = do
     putStrLn $ if fiveRandsCheck then "Ok!" else "Err " ++ show fiveRands
     putStrLn $ if randString3Check then "Ok!" else "Err " ++ show randString3
@@ -103,14 +97,19 @@ main = do
     putStrLn $ if generalPairCheck then "Ok!" else "Err " ++ show (randPair (mkSeed 1)) ++ show (randPair_ (mkSeed 1))
     putStrLn $ if repRandomCheck then "Ok!" else "Err " ++ show (repRandom (replicate  3 randLetter) (mkSeed 1)) ++ show randString3
 
+fiveRandsCheck :: Bool
 fiveRandsCheck = checkProd == product fiveRands
     where checkProd = 8681089573064486461641871805074254223660
 
+randString3Check :: Bool
 randString3Check = randString3 == "lrf"
 
+randEvenOddTenCheck :: Bool
 randEvenOddTenCheck = checkProd == product (map (\f -> fst $ f $ mkSeed 1) [randEven, randOdd, randTen])
     where checkProd = 189908109902700
 
+generalPairCheck :: Bool
 generalPairCheck = randPair (mkSeed 1) == randPair_ (mkSeed 1)
 
+repRandomCheck :: Bool
 repRandomCheck = fst (repRandom (replicate 3 randLetter) (mkSeed 1)) == randString3
