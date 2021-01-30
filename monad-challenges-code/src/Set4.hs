@@ -35,18 +35,6 @@ instance Monad [] where
     return = (:[])
     bind = flip concatMap 
 
--- type synonyms can't have instances, but newtypes,
--- which are as fast and light as type synonyms, can.
--- so we remake the Gen type with the same basic signature
-newtype Gen a = Gen { runGen :: Seed -> (a, Seed) }
-
-evalGen :: Gen a -> Seed -> a
-evalGen g = fst . runGen g
-
-instance Monad Gen where
-    return x = Gen (x,)
-    bind ga fgb = Gen $ \s -> let (r, n) = runGen ga s in runGen (fgb r) n
-
 -- I added this for ease, equivalent to transMonad
 fmap :: Monad m => (a -> b) -> m a -> m b
 fmap f ma = bind ma (return . f)

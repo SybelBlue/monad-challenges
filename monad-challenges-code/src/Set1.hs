@@ -12,7 +12,19 @@ import MCPrelude ( Seed, mkSeed, rand )
 import Data.Char (chr, ord)
 import Data.Tuple (fst)
 
-type Gen a = Seed -> (a, Seed)
+import Set4
+
+-- type synonyms can't have instances, but newtypes,
+-- which are as fast and light as type synonyms, can.
+-- so we remake the Gen type with the same basic signature
+newtype Gen a = Gen { runGen :: Seed -> (a, Seed) }
+
+evalGen :: Gen a -> Seed -> a
+evalGen g = fst . runGen g
+
+instance Monad Gen where
+    return x = Gen (x,)
+    bind ga fgb = Gen $ \s -> let (r, n) = runGen ga s in runGen (fgb r) n
 
 iterateRand1 = flip iterateRand (mkSeed 1)
 
